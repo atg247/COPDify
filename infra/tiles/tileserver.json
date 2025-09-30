@@ -1,0 +1,20 @@
+{
+    "options": {
+      "paths": {
+        "root": ".",
+        "fonts": "fonts",
+        "sprites": "sprites"
+      },
+      "serveStaticMaps": true
+    },
+    "tilesets": [
+      {
+        "id": "zurich-offline",
+        "name": "Zurich Offline Basemap",
+        "type": "baselayer",
+        "format": "mbtiles",
+        "attribution": "© OpenStreetMap contributors",
+        "mbtiles": "zurich_switzerland.mbtiles"
+      }
+    ]
+  }

@@ -1,0 +1,52 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgis/postgis:15-3.3
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: copdify
+      POSTGRES_USER: copdify
+      POSTGRES_PASSWORD: copdify
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+  backend:
+    image: python:3.11-slim
+    working_dir: /app
+    command: bash -c "pip install -r server/requirements.txt && uvicorn app.server.main:app --host 0.0.0.0 --port 8000 --reload"
+    environment:
+      DATABASE_URL: postgresql+psycopg2://copdify:copdify@db:5432/copdify
+    volumes:
+      - ..:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+  frontend:
+    image: node:20-alpine
+    working_dir: /app/client
+    command: sh -c "npm install && npm run dev -- --host"
+    volumes:
+      - ..:/app
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - backend
+
+  tileserver:
+    image: klokantech/tileserver-gl
+    command: ["--config", "/data/tileserver.json"]
+    volumes:
+      - ./tiles:/data:ro
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+
+volumes:
+  db_data:
