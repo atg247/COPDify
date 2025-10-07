@@ -3,10 +3,58 @@ import { create } from 'zustand';
 import api from './api';
 import { Decision, FactorRow, Phase, Plan, TTL, Task } from './types';
 
+interface Risk {
+  id: number;
+  title: string;
+  description?: string;
+  likelihood?: number;
+  impact?: number;
+}
+
+interface DecisiveCondition {
+  id: number;
+  name: string;
+  description?: string;
+  success_criteria?: string;
+  moe?: string;
+  mop?: string;
+}
+
+interface DecisionPoint {
+  id: number;
+  name: string;
+  description?: string;
+  trigger_time?: string;
+  trigger_event?: string;
+}
+
+interface Constraint {
+  id: number;
+  text: string;
+}
+
+interface Assumption {
+  id: number;
+  text: string;
+  validated?: boolean;
+}
+
+interface CCIR {
+  id: number;
+  kind: string;
+  text: string;
+}
+
 interface PlanDetails {
   phases: Phase[];
   tasks: Task[];
   ttl: TTL[];
+  risks: Risk[];
+  decisive_conditions: DecisiveCondition[];
+  decision_points: DecisionPoint[];
+  constraints: Constraint[];
+  assumptions: Assumption[];
+  ccirs: CCIR[];
 }
 
 interface PlanningStore {
@@ -56,6 +104,12 @@ export const usePlanningStore = create<PlanningStore>((set, get) => ({
       phases: data.phases,
       tasks: data.tasks,
       ttl: data.ttl,
+      risks: data.risks || [],
+      decisive_conditions: data.decisive_conditions || [],
+      decision_points: data.decision_points || [],
+      constraints: data.constraints || [],
+      assumptions: data.assumptions || [],
+      ccirs: data.ccirs || [],
     };
     set({ planDetails });
     await get().loadFactors();

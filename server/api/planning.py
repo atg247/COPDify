@@ -38,12 +38,25 @@ def get_plan(plan_id: int, session: Session = Depends(get_session)):
     coas = [schemas.COARead.model_validate(coa) for coa in plan.coas]
     tasks = [schemas.TaskRead.model_validate(task) for task in plan.tasks]
     ttl_items = [schemas.TTLRead.model_validate(ttl) for ttl in plan.ttl_items]
+    risks = [schemas.RiskRead.model_validate(risk) for risk in plan.risks]
+    decisive_conditions = [schemas.DecisiveConditionRead.model_validate(dc) for dc in plan.decisive_conditions]
+    decision_points = [schemas.DecisionPointRead.model_validate(dp) for dp in plan.decision_points]
+    constraints = [schemas.ConstraintRead.model_validate(c) for c in plan.constraints]
+    assumptions = [schemas.AssumptionRead.model_validate(a) for a in plan.assumptions]
+    ccirs = [schemas.CCIRRead.model_validate(ccir) for ccir in plan.ccirs]
+
     return {
         "plan": schemas.PlanRead.model_validate(plan),
         "phases": phases,
         "coas": coas,
         "tasks": tasks,
         "ttl": ttl_items,
+        "risks": risks,
+        "decisive_conditions": decisive_conditions,
+        "decision_points": decision_points,
+        "constraints": constraints,
+        "assumptions": assumptions,
+        "ccirs": ccirs,
     }
 
 

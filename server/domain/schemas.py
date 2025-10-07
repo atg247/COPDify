@@ -286,3 +286,63 @@ class TraceResponse(BaseModel):
     factor: dict
     deduction: dict
     linked_entities: List[dict]
+
+
+class RiskRead(BaseModel):
+    id: int
+    title: str
+    description: Optional[str] = None
+    likelihood: Optional[int] = None
+    impact: Optional[int] = None
+
+    class Config:
+        from_attributes = True
+
+
+class DecisiveConditionRead(BaseModel):
+    id: int
+    name: str
+    description: Optional[str] = None
+    success_criteria: Optional[str] = None
+    moe: Optional[str] = None
+    mop: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
+class DecisionPointRead(BaseModel):
+    id: int
+    name: str
+    description: Optional[str] = None
+    trigger_time: Optional[str] = None
+    trigger_event: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
+class ConstraintRead(BaseModel):
+    id: int
+    text: str
+
+    class Config:
+        from_attributes = True
+
+
+class AssumptionRead(BaseModel):
+    id: int
+    text: str
+    validated: Optional[bool] = None
+
+    class Config:
+        from_attributes = True
+
+
+class CCIRRead(BaseModel):
+    id: int
+    kind: str
+    text: str
+
+    class Config:
+        from_attributes = True

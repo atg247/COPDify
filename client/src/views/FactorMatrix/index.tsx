@@ -6,6 +6,7 @@ import FactorForm from './FactorForm';
 import DeductionForm from './DeductionForm';
 import ConclusionForm from './ConclusionForm';
 import LinkModal from './LinkModal';
+import TraceModal from './TraceModal';
 
 export default function FactorMatrixView() {
   const { selectedPlanId } = usePlanningStore();
@@ -25,6 +26,7 @@ export default function FactorMatrixView() {
   const [showDeductionForm, setShowDeductionForm] = useState<number | null>(null);
   const [showConclusionForm, setShowConclusionForm] = useState<{ factorId: number; deductionId: number } | null>(null);
   const [showLinkModal, setShowLinkModal] = useState<FactorConclusion | null>(null);
+  const [showTraceModal, setShowTraceModal] = useState<number | null>(null);
 
   const [domainFilter, setDomainFilter] = useState<string>('ALL');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
@@ -431,6 +433,7 @@ export default function FactorMatrixView() {
                       <td style={{ padding: '0.75rem', textAlign: 'center' }}>
                         <div style={{ display: 'flex', gap: '0.25rem', justifyContent: 'center' }}>
                           <button
+                            onClick={() => setShowTraceModal(conclusion.id)}
                             style={{
                               padding: '0.25rem 0.5rem',
                               background: 'transparent',
@@ -501,6 +504,13 @@ export default function FactorMatrixView() {
         <LinkModal
           conclusion={showLinkModal}
           onClose={() => setShowLinkModal(null)}
+        />
+      )}
+
+      {showTraceModal && (
+        <TraceModal
+          conclusionId={showTraceModal}
+          onClose={() => setShowTraceModal(null)}
         />
       )}
     </div>
