@@ -3,10 +3,10 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends
 from sqlmodel import Session, select
 
-from app.server.db.base import get_session
-from app.server.db.models import AuditLog
-from app.server.domain import schemas
-from app.server.domain.services.decision_service import DecisionService
+from server.db.base import get_session
+from server.db.models import AuditLog
+from server.domain import schemas
+from server.domain.services.decision_service import DecisionService
 
 router = APIRouter(tags=["Decisions & Audit"])
 

@@ -3,7 +3,14 @@
     "allow": [
       "Read(//c/Users/Käyttäjä/Pictures/Screenshots/**)",
       "Bash(docker logs:*)",
-      "Bash(docker-compose logs:*)"
+      "Bash(docker-compose logs:*)",
+      "Bash(curl:*)",
+      "Bash(cat:*)",
+      "Bash(docker-compose up:*)",
+      "Bash(docker-compose restart:*)",
+      "Bash(docker-compose:*)",
+      "Bash(git checkout:*)",
+      "Bash(python:*)"
     ],
     "deny": [],
     "ask": []

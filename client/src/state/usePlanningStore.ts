@@ -34,7 +34,7 @@ export const usePlanningStore = create<PlanningStore>((set, get) => ({
   loadPlans: async () => {
     set({ loading: true });
     try {
-      const { data } = await api.get<Plan[]>('/plans');
+      const { data } = await api.get<Plan[]>('/plans/');
       set({ plans: data });
       const { selectedPlanId } = get();
       if (!selectedPlanId && data.length > 0) {
@@ -45,7 +45,7 @@ export const usePlanningStore = create<PlanningStore>((set, get) => ({
     }
   },
   createPlan: async (payload) => {
-    const { data } = await api.post<Plan>('/plans', payload);
+    const { data } = await api.post<Plan>('/plans/', payload);
     set((state) => ({ plans: [...state.plans, data] }));
     await get().selectPlan(data.id);
   },

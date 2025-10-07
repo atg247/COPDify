@@ -4,8 +4,8 @@ from typing import List
 
 from sqlmodel import Session, select
 
-from app.server.db.models import AuditLog, Decision
-from app.server.domain import schemas
+from server.db.models import AuditLog, Decision
+from server.domain import schemas
 
 
 class DecisionService:

@@ -3,8 +3,8 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session
 
-from app.server.db.base import get_session
-from app.server.domain.services.force_service import ForceService
+from server.db.base import get_session
+from server.domain.services.force_service import ForceService
 
 router = APIRouter(prefix="/forces", tags=["Forces"])
 

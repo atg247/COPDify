@@ -5,8 +5,8 @@ from typing import Dict
 
 from sqlmodel import Session
 
-from app.server.db.models import TTRResult, TTL
-from app.server.domain import schemas
+from server.db.models import TTRResult, TTL
+from server.domain import schemas
 
 
 class TTRService:

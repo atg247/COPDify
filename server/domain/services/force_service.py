@@ -4,7 +4,7 @@ from typing import List
 
 from sqlmodel import Session, select
 
-from app.server.db.models import UnitGeneric, UnitReal
+from server.db.models import UnitGeneric, UnitReal
 
 
 class ForceService:

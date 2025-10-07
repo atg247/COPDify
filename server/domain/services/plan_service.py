@@ -4,8 +4,8 @@ from typing import List
 
 from sqlmodel import Session, select
 
-from app.server.db.models import Area, COA, Plan, Phase, Task, TTL, TaskCategory
-from app.server.domain import schemas
+from server.db.models import Area, COA, Plan, Phase, Task, TTL, TaskCategory
+from server.domain import schemas
 
 
 class PlanningService:

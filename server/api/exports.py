@@ -3,9 +3,9 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session
 
-from app.server.db.base import get_session
-from app.server.domain import schemas
-from app.server.domain.services.export_service import ExportService
+from server.db.base import get_session
+from server.domain import schemas
+from server.domain.services.export_service import ExportService
 
 router = APIRouter(prefix="/exports", tags=["Exports"])
 
