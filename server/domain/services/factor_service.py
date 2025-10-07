@@ -5,10 +5,12 @@ from typing import Dict, List, Optional, Type
 
 from sqlmodel import Session, select
 
-from app.server.db.models import (
+from server.db.models import (
     Assumption,
     CCIR,
     CCIRKind,
+    COGItem,
+    COGType,
     ConclusionLink,
     ConclusionStatus,
     ConclusionTarget,
@@ -26,7 +28,7 @@ from app.server.db.models import (
     Task,
     TaskCategory,
 )
-from app.server.domain import schemas
+from server.domain import schemas
 
 
 class FactorService:
@@ -37,6 +39,7 @@ class FactorService:
         ConclusionTarget.ASSUMPTION: Assumption,
         ConclusionTarget.DECISIVE_CONDITION: DecisiveCondition,
         ConclusionTarget.DECISION_POINT: DecisionPoint,
+        ConclusionTarget.COG_ITEM: COGItem,
         ConclusionTarget.CCIR: CCIR,
         ConclusionTarget.SYNC: SyncRow,
         ConclusionTarget.INFO_REQ: InfoRequirement,
@@ -67,6 +70,31 @@ class FactorService:
             statement = statement.where(Factor.plan_id == plan_id)
         return list(self.session.exec(statement).all())
 
+    def delete_factor(self, factor_id: int) -> None:
+        """Delete a factor and all its deductions and conclusions"""
+        factor = self._get_factor(factor_id)
+
+        # Delete all conclusions for this factor
+        conclusion_stmt = select(FactorConclusion).where(FactorConclusion.factor_id == factor_id)
+        conclusions = self.session.exec(conclusion_stmt).all()
+        for conclusion in conclusions:
+            # Delete links first
+            link_stmt = select(ConclusionLink).where(ConclusionLink.conclusion_id == conclusion.id)
+            links = self.session.exec(link_stmt).all()
+            for link in links:
+                self.session.delete(link)
+            self.session.delete(conclusion)
+
+        # Delete all deductions
+        deduction_stmt = select(FactorDeduction).where(FactorDeduction.factor_id == factor_id)
+        deductions = self.session.exec(deduction_stmt).all()
+        for deduction in deductions:
+            self.session.delete(deduction)
+
+        # Delete the factor itself
+        self.session.delete(factor)
+        self.session.commit()
+
     # Deduction --------------------------------------------------------
     def add_deduction(self, factor_id: int, data: schemas.FactorDeductionCreate) -> FactorDeduction:
         factor = self._get_factor(factor_id)
@@ -79,6 +107,27 @@ class FactorService:
         self.session.commit()
         self.session.refresh(deduction)
         return deduction
+
+    def delete_deduction(self, deduction_id: int) -> None:
+        """Delete a deduction and all its conclusions"""
+        deduction = self.session.get(FactorDeduction, deduction_id)
+        if not deduction:
+            raise ValueError(f"Deduction {deduction_id} not found")
+
+        # Delete all conclusions for this deduction
+        conclusion_stmt = select(FactorConclusion).where(FactorConclusion.deduction_id == deduction_id)
+        conclusions = self.session.exec(conclusion_stmt).all()
+        for conclusion in conclusions:
+            # Delete links first
+            link_stmt = select(ConclusionLink).where(ConclusionLink.conclusion_id == conclusion.id)
+            links = self.session.exec(link_stmt).all()
+            for link in links:
+                self.session.delete(link)
+            self.session.delete(conclusion)
+
+        # Delete the deduction itself
+        self.session.delete(deduction)
+        self.session.commit()
 
     # Conclusion -------------------------------------------------------
     def add_conclusion(self, factor_id: int, data: schemas.FactorConclusionCreate) -> FactorConclusion:
@@ -110,6 +159,20 @@ class FactorService:
         self.session.commit()
         self.session.refresh(conclusion)
         return conclusion
+
+    def delete_conclusion(self, conclusion_id: int) -> None:
+        """Delete a conclusion and all its links"""
+        conclusion = self._get_conclusion(conclusion_id)
+
+        # Delete all links
+        link_stmt = select(ConclusionLink).where(ConclusionLink.conclusion_id == conclusion_id)
+        links = self.session.exec(link_stmt).all()
+        for link in links:
+            self.session.delete(link)
+
+        # Delete the conclusion itself
+        self.session.delete(conclusion)
+        self.session.commit()
 
     def link_conclusion(self, conclusion_id: int, link_data: schemas.ConclusionLinkCreate) -> ConclusionLink:
         conclusion = self._get_conclusion(conclusion_id)
@@ -269,6 +332,21 @@ class FactorService:
             self.session.refresh(info)
             return info.id
 
+        if target_kind == ConclusionTarget.COG_ITEM:
+            data = schemas.COGItemCreate(**payload)
+            cog = COGItem(
+                plan_id=plan_id,
+                derived_from=derived_from,
+                actor_name=data.actor_name,
+                cog_type=COGType(data.cog_type),
+                description=data.description,
+                analysis_notes=data.analysis_notes,
+            )
+            self.session.add(cog)
+            self.session.commit()
+            self.session.refresh(cog)
+            return cog.id
+
         raise ValueError(f"Cannot auto-create target {target_kind.value}")
 
     def _get_target(self, target_kind: ConclusionTarget, target_id: int):
@@ -296,6 +374,8 @@ class FactorService:
             return obj.text
         if target_kind == ConclusionTarget.INFO_REQ:
             return obj.name
+        if target_kind == ConclusionTarget.COG_ITEM:
+            return f"{obj.actor_name}: {obj.cog_type.value} - {obj.description[:50]}"
         return str(obj)
 
 

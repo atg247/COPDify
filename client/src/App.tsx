@@ -3,11 +3,13 @@ import { NavLink, Route, Routes } from 'react-router-dom';
 import AppLayout from './components/AppLayout';
 import COABoardView from './views/COABoard';
 import DecisionCaptureView from './views/DecisionCapture';
+import FactorMatrixView from './views/FactorMatrix';
 import MapTTLView from './views/MapTTL';
 import PlanWizardView from './views/PlanWizard';
 
 const tabs = [
   { path: '/', label: 'Plan Wizard', element: <PlanWizardView /> },
+  { path: '/factors', label: 'Factor Analysis', element: <FactorMatrixView /> },
   { path: '/map', label: 'Map & TTL', element: <MapTTLView /> },
   { path: '/coa', label: 'COA Board', element: <COABoardView /> },
   { path: '/decisions', label: 'Decision Log', element: <DecisionCaptureView /> },
@@ -37,6 +39,7 @@ export default function App() {
         </nav>
         <Routes>
           <Route path="/" element={<PlanWizardView />} />
+          <Route path="/factors" element={<FactorMatrixView />} />
           <Route path="/map" element={<MapTTLView />} />
           <Route path="/coa" element={<COABoardView />} />
           <Route path="/decisions" element={<DecisionCaptureView />} />

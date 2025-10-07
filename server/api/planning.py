@@ -3,9 +3,9 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session
 
-from app.server.db.base import get_session
-from app.server.domain import schemas
-from app.server.domain.services.plan_service import PlanningService
+from server.db.base import get_session
+from server.domain import schemas
+from server.domain.services.plan_service import PlanningService
 
 router = APIRouter(prefix="/plans", tags=["Planning"])
 

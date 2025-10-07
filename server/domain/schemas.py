@@ -192,16 +192,21 @@ class ConstraintCreate(BaseModel):
 class DecisiveConditionCreate(BaseModel):
     name: str
     description: Optional[str] = None
-    measures: Optional[str] = None
+    success_criteria: Optional[str] = None
+    moe: Optional[str] = None
+    mop: Optional[str] = None
+    related_effects: Optional[str] = None
     phase_id: Optional[int] = None
 
 
 class DecisionPointCreate(BaseModel):
     name: str
     description: Optional[str] = None
-    trigger_expr: Optional[str] = None
+    trigger_time: Optional[str] = None
+    trigger_event: Optional[str] = None
+    trigger_geo: Optional[str] = None
     location_area_id: Optional[int] = None
-    options: Optional[str] = None
+    branches_sequels: Optional[str] = None
     phase_id: Optional[int] = None
     coa_id: Optional[int] = None
 
@@ -222,6 +227,13 @@ class SyncRowCreate(BaseModel):
 class InfoRequirementCreate(BaseModel):
     name: str
     description: Optional[str] = None
+
+
+class COGItemCreate(BaseModel):
+    actor_name: str
+    cog_type: str
+    description: str
+    analysis_notes: Optional[str] = None
 
 
 class DecisionCreate(BaseModel):

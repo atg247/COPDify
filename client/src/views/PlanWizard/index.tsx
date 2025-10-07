@@ -1,11 +1,19 @@
-import { FormEvent, useState } from 'react';
+import { FormEvent, useState, useEffect } from 'react';
 
 import { usePlanningStore } from '../../state/usePlanningStore';
 
 export default function PlanWizardView() {
-  const { selectedPlanId, plans, planDetails, createPhase, createTask, factors, loadFactors } = usePlanningStore();
+  const { selectedPlanId, plans, planDetails, createPhase, createTask, factors, loadFactors, selectPlan } = usePlanningStore();
   const [phaseName, setPhaseName] = useState('');
   const [taskName, setTaskName] = useState('');
+
+  // Reload plan details when component mounts or when navigating back to this tab
+  useEffect(() => {
+    if (selectedPlanId) {
+      selectPlan(selectedPlanId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (!selectedPlanId) {
     return <p>Select or create a plan to begin the COPD wizard.</p>;

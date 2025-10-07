@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import datetime
 from enum import Enum
 from typing import List, Optional
@@ -21,6 +19,7 @@ class Plan(SQLModel, table=True):
     phases: List["Phase"] = Relationship(back_populates="plan")
     coas: List["COA"] = Relationship(back_populates="plan")
     tasks: List["Task"] = Relationship(back_populates="plan")
+    ttl_items: List["TTL"] = Relationship(back_populates="plan")
     decisions: List["Decision"] = Relationship(back_populates="plan")
     factors: List["Factor"] = Relationship(back_populates="plan")
     risks: List["Risk"] = Relationship(back_populates="plan")
@@ -31,6 +30,7 @@ class Plan(SQLModel, table=True):
     ccirs: List["CCIR"] = Relationship(back_populates="plan")
     sync_rows: List["SyncRow"] = Relationship(back_populates="plan")
     info_requirements: List["InfoRequirement"] = Relationship(back_populates="plan")
+    cog_items: List["COGItem"] = Relationship(back_populates="plan")
 
 
 class Phase(SQLModel, table=True):
@@ -122,6 +122,7 @@ class TTL(SQLModel, table=True):
     relative_to: Optional[str] = Field(default="D-Day")
     status: TTLStatus = Field(default=TTLStatus.PLANNED)
 
+    plan: "Plan" = Relationship(back_populates="ttl_items")
     task: Task = Relationship(back_populates="ttl_items")
     phase: Optional[Phase] = Relationship(back_populates="ttl_items")
     area: Optional[Area] = Relationship(back_populates="ttl_items")
@@ -144,6 +145,8 @@ class FactorDomain(str, Enum):
 class Factor(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     plan_id: int = Field(foreign_key="plan.id")
+    phase_id: Optional[int] = Field(default=None, foreign_key="phase.id")
+    coa_id: Optional[int] = Field(default=None, foreign_key="coa.id")
     title: str
     description: Optional[str] = None
     domain: FactorDomain = Field(default=FactorDomain.OTHER)
@@ -153,6 +156,8 @@ class Factor(SQLModel, table=True):
     created_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)
 
     plan: Plan = Relationship(back_populates="factors")
+    phase: Optional["Phase"] = Relationship()
+    coa: Optional["COA"] = Relationship()
     deductions: List["FactorDeduction"] = Relationship(back_populates="factor")
     conclusions: List["FactorConclusion"] = Relationship(back_populates="factor")
 
@@ -183,7 +188,7 @@ class ConclusionType(str, Enum):
 
 class ConclusionStatus(str, Enum):
     DRAFT = "DRAFT"
-    READY = "READY"
+    REVIEWED = "REVIEWED"
     APPROVED = "APPROVED"
 
 
@@ -269,7 +274,10 @@ class DecisiveCondition(SQLModel, table=True):
     phase_id: Optional[int] = Field(default=None, foreign_key="phase.id")
     name: str
     description: Optional[str] = None
-    measures: Optional[str] = None
+    success_criteria: Optional[str] = None
+    moe: Optional[str] = Field(default=None, description="Measure of Effectiveness")
+    mop: Optional[str] = Field(default=None, description="Measure of Performance")
+    related_effects: Optional[str] = None
     derived_from: Optional[str] = None
 
     plan: Plan = Relationship(back_populates="decisive_conditions")
@@ -283,9 +291,11 @@ class DecisionPoint(SQLModel, table=True):
     coa_id: Optional[int] = Field(default=None, foreign_key="coa.id")
     name: str
     description: Optional[str] = None
-    trigger_expr: Optional[str] = None
+    trigger_time: Optional[str] = Field(default=None, description="Time-based trigger (e.g., D+3)")
+    trigger_event: Optional[str] = Field(default=None, description="Event-based trigger")
+    trigger_geo: Optional[str] = Field(default=None, description="Geospatial expression")
     location_area_id: Optional[int] = Field(default=None, foreign_key="area.id")
-    options: Optional[str] = None
+    branches_sequels: Optional[str] = Field(default=None, description="JSON array of branch/sequel options")
     derived_from: Optional[str] = None
 
     plan: Plan = Relationship(back_populates="decision_points")
@@ -332,6 +342,24 @@ class InfoRequirement(SQLModel, table=True):
     derived_from: Optional[str] = None
 
     plan: Plan = Relationship(back_populates="info_requirements")
+
+
+class COGType(str, Enum):
+    CRITICAL_CAPABILITY = "critical_capability"
+    CRITICAL_REQUIREMENT = "critical_requirement"
+    CRITICAL_VULNERABILITY = "critical_vulnerability"
+
+
+class COGItem(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    plan_id: int = Field(foreign_key="plan.id")
+    actor_name: str = Field(description="Friendly/Enemy/Neutral actor")
+    cog_type: COGType
+    description: str
+    analysis_notes: Optional[str] = None
+    derived_from: Optional[str] = None
+
+    plan: Plan = Relationship(back_populates="cog_items")
 
 
 class TTRRule(SQLModel, table=True):
