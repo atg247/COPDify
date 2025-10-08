@@ -11,9 +11,12 @@
       "Bash(docker-compose:*)",
       "Bash(git checkout:*)",
       "Bash(python:*)",
+      "Bash(docker exec:*)",
+      "Bash(test:*)",
+      "Bash(git commit:*)",
       "Bash(git merge:*)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git restore:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []

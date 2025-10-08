@@ -191,26 +191,6 @@ class FactorService:
         self.session.refresh(link)
         return link
 
-    # Trace ------------------------------------------------------------
-    def build_trace(self, conclusion_id: int) -> schemas.TraceResponse:
-        conclusion = self._get_conclusion(conclusion_id)
-        factor = conclusion.factor
-        deduction = conclusion.deduction
-        links_payload: List[dict] = []
-        for link in conclusion.links:
-            target_info = {"kind": link.target_kind.value, "target_id": link.target_id}
-            if link.target_id:
-                target_obj = self._get_target(link.target_kind, link.target_id)
-                if target_obj:
-                    target_info["summary"] = self._summarize_target(link.target_kind, target_obj)
-            links_payload.append(target_info)
-        return schemas.TraceResponse(
-            conclusion_id=conclusion.id,
-            factor={"id": factor.id, "title": factor.title, "domain": factor.domain.value},
-            deduction={"id": deduction.id, "text": deduction.text},
-            linked_entities=links_payload,
-        )
-
     # Internal helpers -------------------------------------------------
     def _get_factor(self, factor_id: int) -> Factor:
         factor = self.session.get(Factor, factor_id)
