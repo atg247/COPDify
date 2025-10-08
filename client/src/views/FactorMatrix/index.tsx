@@ -6,7 +6,6 @@ import FactorForm from './FactorForm';
 import DeductionForm from './DeductionForm';
 import ConclusionForm from './ConclusionForm';
 import LinkModal from './LinkModal';
-import TraceModal from './TraceModal';
 
 export default function FactorMatrixView() {
   const { selectedPlanId } = usePlanningStore();
@@ -26,7 +25,6 @@ export default function FactorMatrixView() {
   const [showDeductionForm, setShowDeductionForm] = useState<number | null>(null);
   const [showConclusionForm, setShowConclusionForm] = useState<{ factorId: number; deductionId: number } | null>(null);
   const [showLinkModal, setShowLinkModal] = useState<FactorConclusion | null>(null);
-  const [showTraceModal, setShowTraceModal] = useState<number | null>(null);
 
   const [domainFilter, setDomainFilter] = useState<string>('ALL');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
@@ -431,42 +429,26 @@ export default function FactorMatrixView() {
                       </td>
                       <td style={{ padding: '0.75rem', fontSize: '0.875rem', color: '#94a3b8' }}>{conclusion.owner || '-'}</td>
                       <td style={{ padding: '0.75rem', textAlign: 'center' }}>
-                        <div style={{ display: 'flex', gap: '0.25rem', justifyContent: 'center' }}>
+                        {dedIndex === 0 && conIndex === 0 && (
                           <button
-                            onClick={() => setShowTraceModal(conclusion.id)}
+                            onClick={() => {
+                              if (confirm('Delete this factor and all its deductions/conclusions?')) {
+                                deleteFactor(factor.id);
+                              }
+                            }}
                             style={{
                               padding: '0.25rem 0.5rem',
                               background: 'transparent',
-                              color: '#64748b',
+                              color: '#ef4444',
                               border: 'none',
                               cursor: 'pointer',
-                              fontSize: '0.875rem'
+                              fontSize: '1rem'
                             }}
-                            title="View trace"
+                            title="Delete factor"
                           >
-                            🔍
+                            🗑️
                           </button>
-                          {dedIndex === 0 && conIndex === 0 && (
-                            <button
-                              onClick={() => {
-                                if (confirm('Delete this factor and all its deductions/conclusions?')) {
-                                  deleteFactor(factor.id);
-                                }
-                              }}
-                              style={{
-                                padding: '0.25rem 0.5rem',
-                                background: 'transparent',
-                                color: '#ef4444',
-                                border: 'none',
-                                cursor: 'pointer',
-                                fontSize: '1rem'
-                              }}
-                              title="Delete factor"
-                            >
-                              🗑️
-                            </button>
-                          )}
-                        </div>
+                        )}
                       </td>
                     </tr>
                   ));
@@ -504,13 +486,6 @@ export default function FactorMatrixView() {
         <LinkModal
           conclusion={showLinkModal}
           onClose={() => setShowLinkModal(null)}
-        />
-      )}
-
-      {showTraceModal && (
-        <TraceModal
-          conclusionId={showTraceModal}
-          onClose={() => setShowTraceModal(null)}
         />
       )}
     </div>

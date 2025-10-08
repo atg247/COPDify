@@ -281,13 +281,6 @@ class ConopsExportResponse(BaseModel):
     content: str
 
 
-class TraceResponse(BaseModel):
-    conclusion_id: int
-    factor: dict
-    deduction: dict
-    linked_entities: List[dict]
-
-
 class RiskRead(BaseModel):
     id: int
     title: str

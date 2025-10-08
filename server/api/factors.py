@@ -156,12 +156,3 @@ def set_conclusion_status(conclusion_id: int, payload: schemas.ConclusionStatusU
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     return conclusion
-
-
-@router.get("/conclusions/{conclusion_id}/trace", response_model=schemas.TraceResponse)
-def get_trace(conclusion_id: int, session: Session = Depends(get_session)):
-    service = _service(session)
-    try:
-        return service.build_trace(conclusion_id)
-    except ValueError as exc:
-        raise HTTPException(status_code=404, detail=str(exc)) from exc
